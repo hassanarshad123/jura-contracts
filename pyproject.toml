@@ -1,6 +1,6 @@
 [project]
 name = "juraai-contracts"
-version = "0.1.1"
+version = "0.1.2"
 description = "Jura AI — shared cross-repo contracts (JSON Schema, codegen to TypeScript + Python)."
 readme = "README.md"
 requires-python = ">=3.12"
