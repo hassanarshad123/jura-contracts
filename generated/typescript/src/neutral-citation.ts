@@ -1,0 +1,13 @@
+import { z } from "zod"
+
+/**A parsed Jura neutral citation, JR-<year>-<court>-<seq> (Doc 24 §11). Field-for-field match of jura-app's services/ai/src/juraai_ai/verifier/normalize.py::NeutralCitation dataclass, read in full 2026-07-27 - this is Jura's own IP layer and is UNIQUE per authority (Doc 16 §1). `canonical` is the zero-padded, upper-cased display form (JR-2019-SC-0007) that colon/dot/slash/space/hyphen input variants all normalize to; year and seq are rejected at parse time if they are 0 (a fabricated zero-cite must never reach a lookup key). Phase 3.3.1 of the Jura AI engineering foundation plan.*/
+export const NeutralCitationSchema = z.object({ 
+/**The 4-digit year segment. Zero is rejected at parse time (F11) so it can never reach this schema.*/
+"year": z.number().int().gte(1).describe("The 4-digit year segment. Zero is rejected at parse time (F11) so it can never reach this schema."), 
+/**The upper-cased court abbreviation segment (e.g. "SC", "LHC") - not the expanded court name (see normalize_court for that separate concern).*/
+"court": z.string().min(1).describe("The upper-cased court abbreviation segment (e.g. \"SC\", \"LHC\") - not the expanded court name (see normalize_court for that separate concern)."), 
+/**The sequence number segment, bounded to 1-6 digits by the parser so a pathological input cannot canonicalize into an arbitrarily large key. Zero is rejected at parse time (F11).*/
+"seq": z.number().int().gte(1).describe("The sequence number segment, bounded to 1-6 digits by the parser so a pathological input cannot canonicalize into an arbitrarily large key. Zero is rejected at parse time (F11)."), 
+/**The canonical display form, JR-<year:04d>-<COURT>-<seq:04d>, that every separator/case variant of this citation normalizes to.*/
+"canonical": z.string().regex(new RegExp("^JR-\\d{4}-[A-Z]+-\\d{4,}$")).describe("The canonical display form, JR-<year:04d>-<COURT>-<seq:04d>, that every separator/case variant of this citation normalizes to.") }).strict().describe("A parsed Jura neutral citation, JR-<year>-<court>-<seq> (Doc 24 §11). Field-for-field match of jura-app's services/ai/src/juraai_ai/verifier/normalize.py::NeutralCitation dataclass, read in full 2026-07-27 - this is Jura's own IP layer and is UNIQUE per authority (Doc 16 §1). `canonical` is the zero-padded, upper-cased display form (JR-2019-SC-0007) that colon/dot/slash/space/hyphen input variants all normalize to; year and seq are rejected at parse time if they are 0 (a fabricated zero-cite must never reach a lookup key). Phase 3.3.1 of the Jura AI engineering foundation plan.")
+export type NeutralCitation = z.infer<typeof NeutralCitationSchema>

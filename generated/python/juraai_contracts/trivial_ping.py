@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from typing import Annotated
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -14,5 +16,5 @@ class TrivialPing(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    message: str = Field(..., description='An arbitrary text payload.')
-    count: int = Field(..., description='An arbitrary integer payload.')
+    message: Annotated[str, Field(description='An arbitrary text payload.')]
+    count: Annotated[int, Field(description='An arbitrary integer payload.')]

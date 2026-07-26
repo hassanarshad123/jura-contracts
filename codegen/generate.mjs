@@ -94,6 +94,12 @@ function main() {
         "--use-schema-description",
         "--target-python-version", "3.12",
         "--disable-timestamp",
+        // Emit typing.Annotated[str, StringConstraints(...)] instead of bare constr()/conint()
+        // calls-as-annotations - mypy (without the pydantic mypy plugin, which this repo does
+        // not enable) rejects a function call used directly as a type annotation ("Cannot use a
+        // function call in a type annotation"), which the first 3 real (non-trivial) schemas hit
+        // the moment they added a minLength/minimum constraint.
+        "--use-annotated",
       ],
       { stdio: "inherit", cwd: ROOT },
     );

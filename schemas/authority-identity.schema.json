@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://jura.ai/contracts/authority-identity.schema.json",
+  "title": "AuthorityIdentity",
+  "description": "The cross-repo identity of one authority/judgment - which citable case this is, independent of good-law status (see good-law-status.schema.json / citator-finding.schema.json for that) and independent of AI-service-internal ranking/display fields (authority_weight, headnote_id, full_text_ref, is_canary) that stay local to services/ai. Derived from jura-app's services/ai/src/juraai_ai/corpus/models.py::CanonicalAuthority (read in full 2026-07-27), scoped to the identity-defining subset load-bearing in corpus/repository.py's CorpusIntegrityError: `id` is the PRIMARY KEY over the whole corpus (Doc 16 §1) - a duplicate id is a data-integrity violation the repository fails fast on, never a silent last-write-wins, because the citation index and get_authority() must never disagree about which object an id names. `neutral_citation` is Jura's own IP layer and is UNIQUE (Doc 16 §1). This schema is the identity concept only; the Postgres-backed corpus (Phase 5) and jura-data's own judgment/citation tables are mapped against it in Phase 5.1's data-contract-alignment step, not decided here. Phase 3.3.2 of the Jura AI engineering foundation plan.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "neutral_citation", "parties", "court", "court_level", "jurisdiction"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The PRIMARY KEY identifying exactly one authority across the whole corpus (visible and canary rows share one id space). A duplicate id is a data-integrity violation (CorpusIntegrityError), not an ambiguity to resolve around."
+    },
+    "neutral_citation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Jura's own neutral-citation IP layer (see neutral-citation.schema.json for the parsed form) - UNIQUE per authority (Doc 16 §1)."
+    },
+    "reported_citations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Raw reported-citation strings for this authority (e.g. \"PLD 2019 SC 675\"). Matches CanonicalAuthority.reported_citations exactly: a tuple of raw strings, not pre-normalized - see reported-citation.schema.json for the normalization step callers apply."
+    },
+    "parties": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The party-name string (e.g. \"Khan v. Federal Board of Revenue\"), used both for display and as the bounded-fuzzy-resolution candidate key (Doc 16 §2)."
+    },
+    "court": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The court that decided this authority (expanded form, e.g. \"Supreme Court\" - see normalize_court in verifier/normalize.py for the abbreviation-expansion rule)."
+    },
+    "court_level": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Court-level rank on Jura's court-hierarchy scale (Doc 24 §11): 1=District, 2=Tribunal, 3=High Court, 4=Federal Shariat, 5=Supreme. Kept as a plain integer (not a closed enum) so an out-of-range or future rank from the corpus does not fail to parse - the corpus is the source of truth, consumers degrade rather than throw."
+    },
+    "jurisdiction": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The jurisdiction this authority belongs to (e.g. \"PK\") - load-bearing for the good-law engine, which models Pakistani edges only (see GoodLawStatus.untracked's meaning for a foreign authority)."
+    },
+    "date": {
+      "type": ["string", "null"],
+      "format": "date",
+      "default": null,
+      "description": "The decision date, when known. Optional: some corpus rows genuinely lack a confirmed date."
+    }
+  }
+}
