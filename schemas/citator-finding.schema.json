@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://jura.ai/contracts/citator-finding.schema.json",
+  "title": "CitatorFinding",
+  "description": "The canonical EVIDENTIARY good-law finding for one authority - the real production vocabulary emitted by jura-data's citator rollup (enrichment/pk_finalize/goodlaw.py::aggregate(), read in full 2026-07-27). This is the GROUND TRUTH: an evidentiary statement about what treatment was found, not yet a display-layer legal conclusion (see good-law-status.schema.json for the derived display enum + the validators/ directory (TS and Python) for the documented mapping between them). Phase 3.2 of the Jura AI engineering foundation plan.",
+  "type": "string",
+  "enum": [
+    "reversed",
+    "superseded",
+    "overruled",
+    "questioned",
+    "caution",
+    "no_negative_found",
+    "insufficient_data"
+  ],
+  "meta:enum": {
+    "reversed": "Reversed or vacated on appeal by a deterministic appeal-history record (goodlaw.py line 103-104) - the highest-confidence negative finding (0.95), not a citation-network inference.",
+    "superseded": "Structurally invalidated - superseded, repealed, found repugnant by the Federal Shariat Court, or held unconstitutional (goodlaw.py line 105-106), independent of the citation network.",
+    "overruled": "A competent (valid-authority) bench overruled, reversed, or abrogated this case, OR disapproved/declined-to-follow/not-followed it with valid authority (goodlaw.py line 114-121, 130-132) - rolled up from the citation-edge network, not a deterministic record.",
+    "questioned": "A competent or conflicting-authority bench criticized, questioned, or limited this case (goodlaw.py line 122-124, 133-135) - weaker than 'overruled', the case's authority is doubted but not displaced.",
+    "caution": "Conflicting or coordinate-bench treatment: an equal-bench overruling attempt (possible per incuriam), or the case was distinguished (goodlaw.py line 117-118, 125-126, 136-138) - genuinely ambiguous, needs human review, not a clean negative or positive finding.",
+    "no_negative_found": "No negative treatment found IN THE REPORTED CORPUS, and citation coverage is adequate (>=0.45) to make that claim honestly (goodlaw.py line 140-144). This is an evidentiary absence-of-evidence claim, not an affirmative 'this case is definitely good law' claim - see the mapping doc for why this distinction matters for the display layer.",
+    "insufficient_data": "Too few resolved citations to assess treatment either way (goodlaw.py line 145, coverage < 0.45) - the honest 'we don't know' finding, never silently defaulted to a positive result."
+  }
+}

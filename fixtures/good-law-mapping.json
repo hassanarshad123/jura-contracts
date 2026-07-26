@@ -1,0 +1,9 @@
+[
+  { "finding": "reversed", "expected_status": "overruled" },
+  { "finding": "overruled", "expected_status": "overruled" },
+  { "finding": "superseded", "expected_status": "superseded" },
+  { "finding": "questioned", "expected_status": "doubted" },
+  { "finding": "caution", "expected_status": "doubted" },
+  { "finding": "no_negative_found", "expected_status": "good" },
+  { "finding": "insufficient_data", "expected_status": "untracked" }
+]

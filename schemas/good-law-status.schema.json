@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://jura.ai/contracts/good-law-status.schema.json",
+  "title": "GoodLawStatus",
+  "description": "The DISPLAY-layer good-law legal conclusion shown to a lawyer - jura-app's existing taxonomy (previously independently defined in packages/schema/src/chat.ts::GOOD_LAW_STATUS, services/ai's corpus/models.py, and duplicated informally in jura-review's lib/types.ts). This value is DERIVED from a CitatorFinding via the documented mapping in the validators/ directory (TS and Python) - never computed independently a second time. Phase 3.2 of the Jura AI engineering foundation plan.",
+  "type": "string",
+  "enum": ["good", "doubted", "overruled", "superseded", "untracked"],
+  "meta:enum": {
+    "good": "No negative treatment found, with adequate citation coverage to make that claim (derived from CitatorFinding.no_negative_found).",
+    "doubted": "The case's authority is in question but not displaced - derived from CitatorFinding.questioned or CitatorFinding.caution (two evidentiary findings collapse to this one display value; see the mapping doc for why that's an intentional simplification, not information loss that matters at the display layer).",
+    "overruled": "No longer good law due to a superior determination - derived from CitatorFinding.overruled or CitatorFinding.reversed.",
+    "superseded": "Structurally invalidated (statute repealed/struck down, not a citation-network finding) - derived from CitatorFinding.superseded.",
+    "untracked": "Computed-only, never persisted: the PK good-law graph doesn't cover this authority/jurisdiction, OR (per the documented mapping) coverage is too sparse to assess (CitatorFinding.insufficient_data). See the mapping doc for why these two distinct evidentiary meanings share one display value."
+  }
+}

@@ -1,0 +1,5 @@
+import { z } from "zod"
+
+/**The DISPLAY-layer good-law legal conclusion shown to a lawyer - jura-app's existing taxonomy (previously independently defined in packages/schema/src/chat.ts::GOOD_LAW_STATUS, services/ai's corpus/models.py, and duplicated informally in jura-review's lib/types.ts). This value is DERIVED from a CitatorFinding via the documented mapping in the validators/ directory (TS and Python) - never computed independently a second time. Phase 3.2 of the Jura AI engineering foundation plan.*/
+export const GoodLawStatusSchema = z.enum(["good","doubted","overruled","superseded","untracked"]).describe("The DISPLAY-layer good-law legal conclusion shown to a lawyer - jura-app's existing taxonomy (previously independently defined in packages/schema/src/chat.ts::GOOD_LAW_STATUS, services/ai's corpus/models.py, and duplicated informally in jura-review's lib/types.ts). This value is DERIVED from a CitatorFinding via the documented mapping in the validators/ directory (TS and Python) - never computed independently a second time. Phase 3.2 of the Jura AI engineering foundation plan.")
+export type GoodLawStatus = z.infer<typeof GoodLawStatusSchema>
