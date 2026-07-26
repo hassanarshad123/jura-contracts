@@ -4,16 +4,24 @@
   "private": false,
   "description": "Jura AI — shared cross-repo contracts (JSON Schema, codegen to TypeScript + Python). Single source of truth for concepts shared across jura-app, jura-data, and jura-review.",
   "type": "module",
-  "main": "./generated/typescript/src/index.ts",
-  "types": "./generated/typescript/src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./generated/typescript/src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": "24.x"
   },
   "scripts": {
     "codegen": "node codegen/generate.mjs",
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
     "test": "node --test codegen/*.test.mjs validators/typescript/src/*.test.mjs",
     "lint": "eslint ."
   },
