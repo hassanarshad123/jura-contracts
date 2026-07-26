@@ -59,6 +59,7 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm run lint
       - run: npm test
 
   python:
