@@ -45,8 +45,22 @@ a **two-layer model**:
 | `superseded` | → | `superseded` | Direct — structural invalidation, not a citation-network finding, but the same name and meaning. |
 | `questioned` | → | `doubted` | Authority in doubt, not displaced. |
 | `caution` | → | `doubted` | Conflicting/coordinate-bench treatment, or distinguished — also "in doubt, not displaced." **Two evidentiary findings intentionally collapse to one display value** — both already mean "read this case's continuing authority carefully" to a lawyer. |
-| `no_negative_found` | → | `good` | Clean evidentiary finding, coverage-gated by the citator itself before it's even emitted. |
+| `no_negative_found` | → | `good` | Clean evidentiary finding, coverage-gated by the citator itself before it's even emitted — **but this label does not distinguish a coverage-floor "good" from a fully-covered one.** `goodlaw.py`'s own confidence computation (`conf = 0.5 + 0.4 * min(1.0, coverage)`) means a case that just clears the coverage floor (`COVERAGE_MIN`) can land here with confidence ≈0.68, while a well-covered case lands here at ≈0.9 — both display as the identical, undifferentiated `"good"` badge today, since `CitatorFinding` (below) carries only the `status` field, not `confidence`/`reason`/`evidence`. `good` is also the one label most likely to invite reliance (every other value is inherently hedged or negative) — code review flagged this asymmetry (2026-07-27): this row previously got one clause of reasoning while `insufficient_data` below got a full paragraph, despite `good` arguably being the higher-stakes case. Revisit if/when confidence is surfaced to the display layer (see "Known scope gap" below). |
 | `insufficient_data` | → | `untracked` | **The one real semantic gap** (documented in the validator, not silently papered over): jura-app's `untracked` originally meant "PK good-law graph doesn't cover this jurisdiction at all" (a coverage-*existence* gap); `insufficient_data` means "this IS a tracked PK case, the citation graph is just too thin to assess" (a coverage-*density* gap). Different claims. Same practical effect for a lawyer — an honest "we can't tell you" rather than a fabricated verdict — so they share the display value for now. |
+
+## Known scope gap (found by code review, 2026-07-27)
+
+`CitatorFinding` (`schemas/citator-finding.schema.json`) captures only `goodlaw.py::aggregate()`'s
+`status` field — a bare string enum. The real function returns a 5-key dict:
+`{status, reason, confidence, evidence, is_bad_law}`. `confidence`/`reason`/`evidence` are
+**deliberately not modeled here** (Phase 3.2 scoped `CitatorFinding` to the 7 status values), but
+that means the one signal that could distinguish a marginal finding from a well-supported one
+never reaches the display layer at all — see the `no_negative_found` row above for the concrete
+case. This is a real, tracked gap, not an oversight papered over: if/when the product wants to
+show confidence (e.g. a lawyer-facing "how sure is this?" indicator), `CitatorFinding` needs to
+grow beyond a bare enum into an object shape carrying at least `status` + `confidence`, and the
+mapping/validators need a second pass. Tracked as a precondition to revisit at checkpoint 3.2.5
+(the human spot-check) and/or before Phase 5.5.5's production flip — not resolved in this pass.
 
 ## Open item
 

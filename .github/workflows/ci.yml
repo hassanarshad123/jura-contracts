@@ -48,7 +48,7 @@ jobs:
           git diff --exit-code generated/ || (echo "::error::generated/ is out of date - run 'npm run codegen' and commit the result" && exit 1)
 
   typescript:
-    name: ts lint · test
+    name: ts lint · types · test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -60,6 +60,12 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
+      # CHARTER.md §3's CI-parity bar requires a type-check gate on every repo (code review
+      # finding, 2026-07-27): `npm test` alone doesn't check types - it runs .test.mjs files that
+      # import .ts sources via Node's type-stripping, which ERASES annotations syntactically
+      # rather than checking them. `npm run build` runs the real `tsc` compile, matching the
+      # `prepare` script every git-dependency consumer already relies on.
+      - run: npm run build
       - run: npm test
 
   python:
