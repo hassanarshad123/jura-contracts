@@ -132,6 +132,13 @@ function main() {
     "\n";
   writeFileSync(join(PY_OUT_DIR, "__init__.py"), pyIndex);
 
+  // PEP 561 marker (found missing by a downstream consumer, 2026-07-27): without this, every
+  // mypy run in every consuming repo treats this package as untyped (import-untyped), silently
+  // losing type-checking on every CitatorFinding/GoodLawStatus/etc. usage - exactly the kind of
+  // gap that's invisible until a real consumer actually runs mypy against it. Empty marker file,
+  // not schema-derived, so it's written here rather than per-schema.
+  writeFileSync(join(PY_OUT_DIR, "py.typed"), "");
+
   console.log(`\nGenerated ${schemaFiles.length} schema(s) -> TypeScript + Python. Done.`);
 }
 
