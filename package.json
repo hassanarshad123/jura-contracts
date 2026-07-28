@@ -1,6 +1,6 @@
 {
   "name": "@juraai/contracts",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": false,
   "description": "Jura AI — shared cross-repo contracts (JSON Schema, codegen to TypeScript + Python). Single source of truth for concepts shared across jura-app, jura-data, and jura-review.",
   "type": "module",
@@ -24,6 +24,9 @@
     "prepare": "npm run build",
     "test": "node --test codegen/*.test.mjs validators/typescript/src/*.test.mjs",
     "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "zod": "^4"
   },
   "devDependencies": {
     "json-schema-to-zod": "^2.8.1",
