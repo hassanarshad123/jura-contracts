@@ -70,6 +70,29 @@ consuming repo's own CI passing against the new version before that repo's `pack
 `pyproject.toml` pin is updated — never force a breaking bump onto a consumer without its CI
 having proven compatibility first.
 
+## 6. Recurring governance cadence (Phase 9.3.1, added 2026-07-28)
+
+This charter, and the fundamentals it documents, are not a one-time fix — without a standing
+cadence, the product drifts back to the "no consistent standards, no shared source of truth"
+state the engineering foundation plan was written to correct. **Quarterly** (next due
+2026-10-28), re-run a scoped version of that original audit against all four repos:
+
+- Re-check the CI-parity bar (§3) still holds on all four repos, not just at the moment each was
+  fixed.
+- Re-scan for new cross-repo type duplication (the same failure mode Phase 3 fixed for good-law
+  status/citation/authority-identity — a new concept can drift the same way if nobody's watching).
+- Re-check the mypy/lint backlog ratchets (jura-data's `mypy-baseline.txt`, jura-contracts' own
+  `CONTRIBUTING.md` review process) haven't silently grown instead of shrinking.
+- Re-confirm the `jura_review` DDL checksum-guard against jura-data (kept indefinitely per the
+  original plan's decisions table — a different concern from Phase 3's vocabulary work, not
+  superseded by it) is still green.
+- Re-verify the OpenSearch tenant no-leak test (§9.3.4 of the original plan) is still a standing,
+  non-optional CI check, not one that quietly got skipped or removed.
+
+No separate tooling required — this is a checklist for whoever picks this up next (human or
+agent), not a new automated system. Record the outcome as a dated entry in this file or in
+`_reference\ENGINEERING_CHARTER.md`'s history if a full re-audit finds real drift worth logging.
+
 ---
 
 *Jura AI — Cross-Repo Engineering Charter · internal.*
