@@ -96,3 +96,34 @@ agent), not a new automated system. Record the outcome as a dated entry in this 
 ---
 
 *Jura AI — Cross-Repo Engineering Charter · internal.*
+
+---
+
+## 7. Credential-handling rules (added 2026-07-30, Phase 9 — learned the hard way)
+
+Four incidents during the Phase 5/7/9 production work all traced to the same root cause: a secret
+being passed through a layer that reinterprets its characters. These are now rules, not preferences.
+
+1. **Never `set -x` in a script that touches a secret.** A traced script printed the RDS master
+   password into SSM command output. Shell tracing expands and echoes every argument, including
+   fetched secret values. Use `set -euo pipefail` without `-x`; if tracing is genuinely needed,
+   `set +x` around the secret-handling block.
+2. **Never interpolate a secret into a shell variable, a `source`d file, or a Python string
+   literal.** Two separate scripts broke this way (`syntax error near unexpected token`, and a
+   `JSONDecodeError` at the interpolation boundary) because passwords contain `$`, `(`, `=`, `&`.
+   Write the secret to a file and have the consumer read the file, or do the whole operation in one
+   Python process that never lets the value touch a shell.
+3. **A password embedded in a URL/DSN must be `urlencode()`d, and preferably alphanumeric.** A `%`
+   in the RDS master password produced a DSN that every compliant parser rejects, breaking
+   `migrate.yml`. `random_password` blocks that feed a connection string use `special = false`
+   (`redis_auth`, `jura_ai_production_db`, `db_master`); where a provider's password policy forbids
+   that (the OpenSearch FGAC domain), use a hand-picked `override_special` that excludes
+   `% # ? @ / :` and every shell metacharacter, plus `min_*` floors so the policy is guaranteed.
+4. **Rotate through the tool that owns the credential.** An out-of-band `aws rds
+   modify-db-instance` left Terraform state recording a password that no longer existed. If
+   Terraform generates it, rotate with `-replace=random_password.X`.
+
+**And one rule about verifying access changes:** when tightening a credential, test the **allow**
+path, not only the deny paths. A scoped OpenSearch role passed all four intended denials while also
+silently failing every *write* — which would have degraded the nightly ETL to "Postgres lands,
+OpenSearch indexes nothing" with no error surfaced. Deny-only testing would have shipped it.
